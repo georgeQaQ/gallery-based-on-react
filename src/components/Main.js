@@ -7,11 +7,10 @@ import ReactDOM from 'react-dom';
 // 获取图片信息
 // import imageDatass from '../data/imageData.json';
 let imageDatass = require('../data/imageData.json');
-let yeomanImage = require('../images/yeoman.png');
 
 //将图片名信息转化成图片路径信息
 const imageDatas = imageDatass.map((image)=>{
-  image.imageURL = '../images/'+image.fileName;
+  image.imageURL = require('../images/'+image.fileName); /*影响文件打包必须用require*/
   return image;
 });
   const getRangeRandom = (low,high) => Math.floor(Math.random()*(high-low)+low);
