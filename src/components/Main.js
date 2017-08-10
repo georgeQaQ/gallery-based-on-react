@@ -3,10 +3,12 @@ require('styles/App.scss');
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 // 获取图片信息
 // import imageDatass from '../data/imageData.json';
 let imageDatass = require('../data/imageData.json');
 let yeomanImage = require('../images/yeoman.png');
+
 //将图片名信息转化成图片路径信息
 const imageDatas = imageDatass.map((image)=>{
   image.imageURL = '../images/'+image.fileName;
@@ -14,6 +16,8 @@ const imageDatas = imageDatass.map((image)=>{
 });
   const getRangeRandom = (low,high) => Math.floor(Math.random()*(high-low)+low);
   const getDegRandom = () => Math.floor(Math.random()*60-30);
+
+  /*图片组件*/
 class ImgFigure extends React.Component {
   constructor(props){
     super(props);
@@ -61,6 +65,34 @@ class ImgFigure extends React.Component {
     )
 }
 }
+
+/*控制组件*/
+class ControllerUnits extends React.Component{
+  constructor(props){
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if(this.props.arrange.iscenter){
+      this.props.inverse();
+    }
+    else{
+      this.props.center();
+    }
+  }
+  render(){
+    let controllerClassName = 'controller-unit';
+    controllerClassName+= this.props.arrange.iscenter ?　' is-center' : '';
+    controllerClassName+= this.props.arrange.isinverse ? ' is-inverse' :　'';
+    return (
+      <span className={controllerClassName} onClick={this.handleClick}></span>
+    )
+  }
+}
+
+/*总组件*/
 class AppComponent extends React.Component {
   constructor(props){
     super(props); /*在ES6中，在子类的constructor中必须先调用super才能引用this super(props)的目的：在constructor中可以使用this.props*/
@@ -140,7 +172,6 @@ class AppComponent extends React.Component {
         let { centerPos,leftSection,rightSection,topSection } = this.Constant;
 
        /*布局中心图片*/
-
        let center = imgsArrangeArr.splice(centerIndex,1);
        center[0] = {    /*从数组中取出仍然是数组类型故center[0]*/
          pos: centerPos,
@@ -203,10 +234,10 @@ class AppComponent extends React.Component {
      }
 
     /*控制居中图片*/
-  center(index){
-    return () =>{
-      this.rearrange(index);}
-  }
+    center(index){
+      return () =>{
+        this.rearrange(index);}
+    }
 
 
      /*render渲染*/
@@ -214,6 +245,7 @@ class AppComponent extends React.Component {
       {
       //定义图片，控制组件
       let controllerUnits = [],imgFigures = [];
+
       imageDatas.forEach((value,index)=>{
         if(!this.state.imgsArrangeArr[index]){
           this.state.imgsArrangeArr[index] = {
@@ -226,11 +258,18 @@ class AppComponent extends React.Component {
             iscenter: false
           }
         }
-        imgFigures.push(<ImgFigure data={value} ref={'imgFigure'+index} inverse={this.inverse(index)}  center={this.center(index)} arrange={this.state.imgsArrangeArr[index]}/>);
+
+        /*push多个图片组件*/
+        imgFigures.push(<ImgFigure key={index} data={value} ref={'imgFigure'+index} inverse={this.inverse(index)}  center={this.center(index)} arrange={this.state.imgsArrangeArr[index]}/>);
+
+        /*push多个控制span*/
+        controllerUnits.push(<ControllerUnits key={index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
       });
 
+
+
       return (
-        <section className="stage" ref={(input)=>{this.stage = input}}>
+        <section className="stage" ref={(input)=>{this.stage = input}}> {/*新版使用ref*/}
           <section className="img-sec">
             {imgFigures}
           </section>
